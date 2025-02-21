@@ -16,6 +16,7 @@ import { CreateDeliverysController } from './controller/deliverys/create-deliver
 import { UpdateDeliveryController } from './controller/deliverys/update-delivery.controller'
 import { ListDeliveryController } from './controller/deliverys/list-delivery.controller'
 import { DeleteDeliveryController } from './controller/deliverys/delete-delivery.controller'
+import { MarkDeliveryAvailableController } from './controller/deliverys/waiting-update-delivery.controller'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { DeleteDeliveryController } from './controller/deliverys/delete-delivery
     UpdateDeliveryController,
     ListDeliveryController,
     DeleteDeliveryController,
+    MarkDeliveryAvailableController,
   ],
   providers: [PrismaService],
 })

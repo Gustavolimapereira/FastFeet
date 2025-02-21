@@ -4,10 +4,11 @@
 # @name create_account
 POST {{baseUrl}}/accounts
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
 	"name": "Gustavo Lima",
-	"cpf": "121.326.518-38",
+	"cpf": "121.326.518-308",
 	"password": "12345236",
 	"role": "ENTREGADOR"
 }
@@ -19,7 +20,7 @@ POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-	"cpf": "121.326.518-38",
+	"cpf": "442.326.518-3",
 	"password": "12345236"
 }
 
