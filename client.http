@@ -1,0 +1,38 @@
+@baseUrl = http://localhost:3333
+@authToken = {{authenticate.response.body.access_token}}
+
+# @name create_account
+POST {{baseUrl}}/accounts
+Content-Type: application/json
+
+{
+	"name": "Gustavo Lima",
+	"cpf": "121.326.518-38",
+	"password": "12345236",
+	"role": "ENTREGADOR"
+}
+
+###
+
+# @name authenticate
+POST {{baseUrl}}/sessions
+Content-Type: application/json
+
+{
+	"cpf": "121.326.518-38",
+	"password": "12345236"
+}
+
+###
+
+# @name update_account
+PUT {{baseUrl}}/accounts/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+	"name": "cinzinha2"
+}
+
+
+// gerando token cod 15

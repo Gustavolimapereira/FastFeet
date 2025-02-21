@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  cpf       String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  DeliveryAdmin Delivery[] @relation(name: "AdminDeliveries")
+  DeliveryMan Delivery[] @relation(name: "DeliverymanDeliveries")
+}
+
+enum Role {
+  ADMIN
+  ENTREGADOR
+}
+
+model Recipient {
+  id        String   @id @default(uuid())
+  name      String
+  cpf       String   @unique
+  address   String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deliveries   Delivery[]
+  notifications Notification[] @relation("RecipientNotifications") // Corrigido
+}
+
+model Delivery {
+  id            String    @id @default(uuid())
+  recipient     Recipient @relation(fields: [recipientId], references: [id])
+  recipientId   String
+  admin         User      @relation(name: "AdminDeliveries", fields: [adminId], references: [id])
+  adminId       String
+  deliveryman   User?     @relation(name: "DeliverymanDeliveries", fields: [deliverymanId], references: [id])
+  deliverymanId String?
+  status        Status
+  photoUrl      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  notifications Notification[]
+}
+
+enum Status {
+  AGUARDANDO
+  RETIRADA
+  ENTREGUE
+  DEVOLVIDA
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  recipient   Recipient @relation(name: "RecipientNotifications", fields: [recipientId], references: [id])
+  recipientId String
+  delivery    Delivery  @relation(fields: [deliveryId], references: [id])
+  deliveryId  String
+  message     String
+  createdAt   DateTime @default(now())
+}
