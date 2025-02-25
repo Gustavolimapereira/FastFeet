@@ -14,21 +14,21 @@ import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
 
-const updateCompletedDeliveryBodySchema = z.object({
-  status: z.enum(['ENTREGUE']).optional(),
+const updateReturnedDeliveryBodySchema = z.object({
+  status: z.enum(['DEVOLVIDA']).optional(),
 })
 
 const bodyValidationPipe = new ZodValidationPipe(
-  updateCompletedDeliveryBodySchema,
+  updateReturnedDeliveryBodySchema,
 )
 
-type UpdatedCompletedDeDeliveryBodySchema = z.infer<
-  typeof updateCompletedDeliveryBodySchema
+type UpdatReturnedDeliveryBodySchema = z.infer<
+  typeof updateReturnedDeliveryBodySchema
 >
 
-@Controller('/delivery/:id/completed')
+@Controller('/delivery/:id/returned')
 @UseGuards(JwtAuthGuard)
-export class MarkDeliveryCompletedController {
+export class MarkDeliveryReturnedController {
   constructor(private prisma: PrismaService) {}
 
   @Put()
@@ -36,7 +36,7 @@ export class MarkDeliveryCompletedController {
   async handle(
     @CurrentUser() userLoad: UserPayload,
     @Param('id') id: string,
-    @Body(bodyValidationPipe) body: UpdatedCompletedDeDeliveryBodySchema,
+    @Body(bodyValidationPipe) body: UpdatReturnedDeliveryBodySchema,
   ) {
     const { status } = body
 
@@ -52,8 +52,8 @@ export class MarkDeliveryCompletedController {
       where: { id },
     })
 
-    if (deliveryToCheck?.status !== 'RETIRADA') {
-      throw new NotFoundException('Essa encomaneda ainda não foi retirada!')
+    if (deliveryToCheck?.status !== 'ENTREGUE') {
+      throw new NotFoundException('Esse pedido ainda não foi entregue!')
     }
 
     await this.prisma.delivery.update({
