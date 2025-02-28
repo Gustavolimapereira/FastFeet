@@ -13,6 +13,7 @@ import { UserPayload } from 'src/auth/jwt.strategy'
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
+import { NotificationService } from '../notification/notification-service.controller'
 
 const updateWithdrawDeliveryBodySchema = z.object({
   status: z.enum(['RETIRADA']).optional(),
@@ -29,7 +30,10 @@ type UpdatWeithdrawDeDeliveryBodySchema = z.infer<
 @Controller('/delivery/:id/withdrawal')
 @UseGuards(JwtAuthGuard)
 export class MarkDeliveryWitchDrawController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   @Put()
   @HttpCode(204)
@@ -42,6 +46,7 @@ export class MarkDeliveryWitchDrawController {
 
     const delivery = await this.prisma.delivery.findUnique({
       where: { id },
+      include: { recipient: true },
     })
 
     if (!delivery) {
@@ -62,5 +67,12 @@ export class MarkDeliveryWitchDrawController {
         status,
       },
     })
+
+    // Notifica o destinatário
+    await this.notificationService.notifyRecipient(
+      id,
+      delivery.recipientId,
+      `Sua encomenda foi retirada para entrega!`,
+    )
   }
 }

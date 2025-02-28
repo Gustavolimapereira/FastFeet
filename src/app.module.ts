@@ -18,6 +18,7 @@ import { ListDeliveryController } from './controller/deliverys/list-delivery.con
 import { DeleteDeliveryController } from './controller/deliverys/delete-delivery.controller'
 import { MarkDeliveryAvailableController } from './controller/deliverys/waiting-update-delivery.controller'
 import { MarkDeliveryWitchDrawController } from './controller/deliverys/withdraw-delivery.controller'
+import { NotificationService } from './controller/notification/notification-service.controller'
 
 @Module({
   imports: [
@@ -44,7 +45,7 @@ import { MarkDeliveryWitchDrawController } from './controller/deliverys/withdraw
     MarkDeliveryAvailableController,
     MarkDeliveryWitchDrawController,
   ],
-  providers: [PrismaService],
+  providers: [PrismaService, NotificationService],
 })
 export class AppModule {}
 
