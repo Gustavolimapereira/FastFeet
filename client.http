@@ -1,19 +1,7 @@
 @baseUrl = http://localhost:3333
 @authToken = {{authenticate.response.body.access_token}}
 
-# @name create_account
-POST {{baseUrl}}/accounts
-Content-Type: application/json
-Authorization: Bearer {{authToken}}
-
-{
-	"name": "Gustavo Lima",
-	"cpf": "121.326.518-308",
-	"password": "12345236",
-	"role": "ENTREGADOR"
-}
-
-###
+### AUTENTICAÇÃO
 
 # @name authenticate
 POST {{baseUrl}}/sessions
@@ -24,6 +12,20 @@ Content-Type: application/json
 	"password": "12345236"
 }
 
+### CRUD DE USUARIOS
+
+# @name create_account
+POST {{baseUrl}}/accounts
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+	"name": "Gustavo Lima",
+	"cpf": "442.326.588-58",
+	"password": "12345236",
+	"role": "ENTREGADOR"
+}
+
 ###
 
 # @name update_account
@@ -32,8 +34,104 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-	"name": "cinzinha2"
+	"role": "ENTREGADOR"
 }
 
+###
 
-// gerando token cod 15
+# @name list_account
+GET {{baseUrl}}/accounts/26631311-0ada-4060-9192-f3acc6425de2
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name delete_account
+DELETE {{baseUrl}}/accounts/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### CRUD DE ENCOMENDAS
+
+# @name create_delivery
+POST {{baseUrl}}/delivery
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"recipientId": "ea442723-f178-4a7b-b72a-4fc5772ea892",
+  	"adminId": "2d4c2c73-b42e-4770-8a78-cdcd7a198420",
+  	"status": "AGUARDANDO",
+  	"photoUrl": "https://blog.zanottirefrigeracao.com.br/wp-content/uploads/2017/09/lanche-na-chapa-1024x768.jpg"
+}
+
+###
+
+# @name update_delivery
+PUT {{baseUrl}}/delivery/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"recipientId": "ea442723-f178-4a7b-b72a-4fc5772ea892",
+  	"adminId": "03fc36e0-a75b-4354-992b-2d0c95bd26ad",
+  	"status": "DEVOLVIDA",
+  	"photoUrl": "https://blog.zanottirefrigeracao.com.br/wp-content/uploads/2017/09/lanche-na-chapa-1024x768.jpg"
+}
+
+###
+
+# @name list_delivery
+Get {{baseUrl}}/delivery/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name delete_delivery
+DELETE {{baseUrl}}/delivery/1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### CRUD DE CLIENTES
+
+# @name create_recipient
+POST {{baseUrl}}/recipients
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "João da Silva",
+  "cpf": "123.456.789-21",
+  "address": "Rua das Palmeiras, 123 - Centro, São Paulo - SP",
+  "latitude": -23.55052,
+  "longitude": -46.633308
+}
+
+###
+
+# @name update_recipient
+PUT {{baseUrl}}/recipients/ea442723-f178-4a7b-b72a-4fc5772ea892
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Marcelo Lopes",
+  "address": "Rua das Ovalhas, 123 - Centro, São Paulo - SP",
+  "latitude": -23.55052,
+  "longitude": -46.633308
+}
+
+###
+
+# @name list_recipient
+GET {{baseUrl}}/recipients/ea442723-f178-4a7b-b72a-4fc5772ea892
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name delete_recipient
+DELETE {{baseUrl}}/recipients/ea442723-f178-4a7b-b72a-4fc5772ea892
+Content-Type: application/json
+Authorization: Bearer {{authToken}}

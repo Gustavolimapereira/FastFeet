@@ -31,12 +31,34 @@ export class DeleteRecipientController {
       where: { id },
     })
 
+    const delivery = await this.prisma.delivery.findMany({
+      where: { recipientId: id },
+    })
+
+    console.log(delivery, 'delivery')
+
+    console.log(user, 'user')
+
     if (!user) {
       throw new NotFoundException('Usuário não encontrado')
+    }
+
+    if (delivery.length > 0) {
+      throw new NotFoundException(
+        'Usuário não pode ser deletado pois tem encomendas associadas',
+      )
     }
 
     await this.prisma.recipient.delete({
       where: { id },
     })
+
+    return {
+      user,
+    }
+
+    /*
+    
+*/
   }
 }
