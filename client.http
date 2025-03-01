@@ -59,7 +59,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  	"recipientId": "ea442723-f178-4a7b-b72a-4fc5772ea892",
+  	"recipientId": "398cff0f-145f-41e5-b5e4-8f40d929aa94",
   	"adminId": "2d4c2c73-b42e-4770-8a78-cdcd7a198420",
   	"status": "AGUARDANDO",
   	"photoUrl": "https://blog.zanottirefrigeracao.com.br/wp-content/uploads/2017/09/lanche-na-chapa-1024x768.jpg"
@@ -101,8 +101,8 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "name": "Luis Xagas",
-  "cpf": "113.456.789-21",
+  "name": "Carolina Fernanda Infante",
+  "cpf": "113.456.789-77",
   "address": "Rua das Palmeiras, 123 - Centro, São Paulo - SP",
   "latitude": -23.55052,
   "longitude": -46.633308
@@ -135,3 +135,63 @@ Authorization: Bearer {{authToken}}
 DELETE {{baseUrl}}/recipients/ea442723-f178-4a7b-b72a-4fc5772ea892
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
+
+### CRUD DE ENTREGA ATUALIZAÇÃO DE STATUS
+
+# @name update_delivery_status_aguardando
+PUT {{baseUrl}}/delivery/1/available
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"status": "AGUARDANDO"
+}
+
+###
+
+# @name update_delivery_status_retirada
+PUT {{baseUrl}}/delivery/1/withdrawal
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"status": "RETIRADA"
+}
+
+###
+
+# @name update_delivery_status_entregue
+PUT {{baseUrl}}/delivery/1/completed
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"status": "ENTREGUE"
+}
+
+###
+
+# @name update_delivery_status_devolvida
+PUT {{baseUrl}}/delivery/1/returned
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  	"status": "DEVOLVIDA"
+}
+
+### LISTA AS ENTREGAS DO USUARIO LOGADO
+
+# @name delivery_user_list
+GET {{baseUrl}}/deliverylist/user
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### LISTA ENTREGAS PROXIMA DO USUARIO
+
+# @name delivery_nearby
+GET {{baseUrl}}/deliverylist/nearby?lat=-23.55052&lng=-46.633308
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###

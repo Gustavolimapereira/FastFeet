@@ -2,7 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { PrismaService } from 'src/prisma/prisma.service'
 
-@Controller('/delivery/nearby')
+@Controller('/deliverylist/nearby')
 @UseGuards(JwtAuthGuard)
 export class NearbyDeliveriesController {
   constructor(private prisma: PrismaService) {}
@@ -20,18 +20,21 @@ export class NearbyDeliveriesController {
     }
 
     const deliveries = await this.prisma.$queryRaw`
-      SELECT d.*, r.latitude, r.longitude,
-        (6371 * ACOS(
-          COS(RADIANS(${lat})) * COS(RADIANS(r.latitude)) *
-          COS(RADIANS(r.longitude) - RADIANS(${lng})) +
-          SIN(RADIANS(${lat})) * SIN(RADIANS(r.latitude))
-        )) AS distance
-      FROM "Delivery" d
-      INNER JOIN "Recipient" r ON d."recipientId" = r.id
-      WHERE d.status = 'AGUARDANDO'
-      HAVING distance < 10
-      ORDER BY distance ASC
-    `
+  WITH deliveries_with_distance AS (
+    SELECT d.*, r.latitude, r.longitude,
+      (6371 * ACOS(
+        COS(RADIANS(${lat})) * COS(RADIANS(r.latitude)) *
+        COS(RADIANS(r.longitude) - RADIANS(${lng})) +
+        SIN(RADIANS(${lat})) * SIN(RADIANS(r.latitude))
+      )) AS distance
+    FROM "Delivery" d
+    INNER JOIN "Recipient" r ON d."recipientId" = r.id
+    WHERE d.status = 'AGUARDANDO'
+  )
+  SELECT * FROM deliveries_with_distance
+  WHERE distance < 10
+  ORDER BY distance ASC
+`
 
     return {
       deliveries,

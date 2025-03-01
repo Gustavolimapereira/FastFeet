@@ -13,6 +13,7 @@ import { UserPayload } from 'src/auth/jwt.strategy'
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
+import { NotificationService } from '../notification/notification-service.controller'
 
 const updateReturnedDeliveryBodySchema = z.object({
   status: z.enum(['DEVOLVIDA']).optional(),
@@ -29,7 +30,10 @@ type UpdatReturnedDeliveryBodySchema = z.infer<
 @Controller('/delivery/:id/returned')
 @UseGuards(JwtAuthGuard)
 export class MarkDeliveryReturnedController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   @Put()
   @HttpCode(204)
@@ -62,5 +66,12 @@ export class MarkDeliveryReturnedController {
         status,
       },
     })
+
+    // Notifica o destinatário
+    await this.notificationService.notifyRecipient(
+      id,
+      delivery.recipientId,
+      `Sua encomenda foi devolvida!`,
+    )
   }
 }

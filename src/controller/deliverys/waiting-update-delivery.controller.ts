@@ -13,6 +13,7 @@ import { UserPayload } from 'src/auth/jwt.strategy'
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { z } from 'zod'
+import { NotificationService } from '../notification/notification-service.controller'
 
 const updateWaitingDeliveryBodySchema = z.object({
   status: z.enum(['AGUARDANDO']).optional(),
@@ -29,7 +30,10 @@ type UpdateWaitingDeDeliveryBodySchema = z.infer<
 @Controller('/delivery/:id/available')
 @UseGuards(JwtAuthGuard)
 export class MarkDeliveryAvailableController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   @Put()
   @HttpCode(204)
@@ -72,5 +76,12 @@ export class MarkDeliveryAvailableController {
         status,
       },
     })
+
+    // Notifica o destinatário
+    await this.notificationService.notifyRecipient(
+      id,
+      delivery.recipientId,
+      `Sua encomenda esta pronta! Aguardando retirada`,
+    )
   }
 }

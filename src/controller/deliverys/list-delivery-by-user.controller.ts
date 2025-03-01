@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { UserPayload } from 'src/auth/jwt.strategy'
 import { PrismaService } from 'src/prisma/prisma.service'
 
-@Controller('/delivery/user/')
+@Controller('/deliverylist/user/')
 @UseGuards(JwtAuthGuard)
 export class ListDeliveryByUserController {
   constructor(private prisma: PrismaService) {}

@@ -44,6 +44,14 @@ export class MarkDeliveryWitchDrawController {
   ) {
     const { status } = body
 
+    const userLogin = await this.prisma.user.findUnique({
+      where: { id: userLoad.sub },
+    })
+
+    if (userLogin?.role !== 'ENTREGADOR') {
+      throw new NotFoundException('Usuário não é um entregador do sistema')
+    }
+
     const delivery = await this.prisma.delivery.findUnique({
       where: { id },
       include: { recipient: true },
@@ -58,12 +66,15 @@ export class MarkDeliveryWitchDrawController {
     })
 
     if (deliveryToCheck?.status !== 'AGUARDANDO') {
-      throw new NotFoundException('Esse pedido ainda não esta pronto!')
+      throw new NotFoundException(
+        'Esse pedido ainda não esta pronto, ou já foi retirado',
+      )
     }
 
     await this.prisma.delivery.update({
       where: { id },
       data: {
+        deliverymanId: userLogin?.id,
         status,
       },
     })
@@ -72,7 +83,7 @@ export class MarkDeliveryWitchDrawController {
     await this.notificationService.notifyRecipient(
       id,
       delivery.recipientId,
-      `Sua encomenda foi retirada para entrega!`,
+      `Sua encomenda esta a caminho!`,
     )
   }
 }
