@@ -21,7 +21,7 @@ Authorization: Bearer {{authToken}}
 
 {
 	"name": "Gustavo Lima",
-	"cpf": "442.326.588-58",
+	"cpf": "442.326.578-58",
 	"password": "12345236",
 	"role": "ENTREGADOR"
 }
@@ -101,8 +101,8 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "name": "João da Silva",
-  "cpf": "123.456.789-21",
+  "name": "Luis Xagas",
+  "cpf": "113.456.789-21",
   "address": "Rua das Palmeiras, 123 - Centro, São Paulo - SP",
   "latitude": -23.55052,
   "longitude": -46.633308
