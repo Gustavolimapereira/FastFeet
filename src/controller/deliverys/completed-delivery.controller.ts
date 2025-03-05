@@ -44,6 +44,10 @@ export class MarkDeliveryCompletedController {
   ) {
     const { status } = body
 
+    const userlogin = await this.prisma.user.findUnique({
+      where: { id: userLoad.sub },
+    })
+
     const delivery = await this.prisma.delivery.findUnique({
       where: { id },
     })
@@ -58,6 +62,18 @@ export class MarkDeliveryCompletedController {
 
     if (deliveryToCheck?.status !== 'RETIRADA') {
       throw new NotFoundException('Essa encomaneda ainda não foi retirada!')
+    }
+
+    if (deliveryToCheck?.photoUrl === null) {
+      throw new NotFoundException(
+        'É obrigatorio o envio de uma foto para encerrar o pedido.',
+      )
+    }
+
+    if (userlogin?.id !== deliveryToCheck.deliverymanId) {
+      throw new NotFoundException(
+        'Apenas o entregador que retirou a encomenda pode marca-la como entregue',
+      )
     }
 
     await this.prisma.delivery.update({
