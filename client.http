@@ -21,7 +21,7 @@ Authorization: Bearer {{authToken}}
 
 {
 	"name": "Gustavo Lima",
-	"cpf": "442.326.578-58",
+	"cpf": "442.326.578-18",
 	"password": "12345236",
 	"role": "ENTREGADOR"
 }
