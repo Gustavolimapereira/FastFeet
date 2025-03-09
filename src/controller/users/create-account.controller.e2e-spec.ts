@@ -1,12 +1,15 @@
 import { AppModule } from '@/app.module'
 import { PrismaService } from '@/prisma/prisma.service'
 import { INestApplication } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
+import * as bcrypt from 'bcrypt'
 import request from 'supertest'
 
 describe('Criar conta (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
+  let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -17,25 +20,45 @@ describe('Criar conta (E2E)', () => {
 
     prisma = moduleRef.get(PrismaService)
 
+    jwt = moduleRef.get(JwtService)
+
     await app.init()
   })
 
   test('[POST] /accounts', async () => {
-    const response = await request(app.getHttpServer()).post('/accounts').send({
-      name: 'John Doe',
-      cpf: '111.111.111-11',
-      password: '123456',
-      role: 'ENTREGADOR',
-    })
+    const password = '123456'
 
-    expect(response.statusCode).toBe(201)
-
-    const userOnDatabase = await prisma.user.findUnique({
-      where: {
-        cpf: '111.111.111-11',
+    const user = await prisma.user.create({
+      data: {
+        name: 'admin',
+        cpf: '000.000.000-00',
+        password: await bcrypt.hash(password, 8),
+        role: 'ADMIN',
       },
     })
 
-    expect(userOnDatabase).toBeTruthy()
+    const accessToken = jwt.sign({ sub: user.id })
+
+    const responseLogin = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        cpf: '000.000.000-00',
+        password: '123456',
+      })
+
+    expect(responseLogin.statusCode).toBe(201)
+
+    // essa parte esta dando erro
+    const response = await request(app.getHttpServer())
+      .post('/accounts')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'John Doe',
+        cpf: '111.111.111-11',
+        password: '123456',
+        role: 'ENTREGADOR',
+      })
+
+    expect(response.statusCode).toBe(201)
   })
 })

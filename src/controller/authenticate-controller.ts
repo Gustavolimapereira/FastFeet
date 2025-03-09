@@ -37,13 +37,13 @@ export class AuthenticateController {
     })
 
     if (!user) {
-      throw new UnauthorizedException('Credenciais não encontradas.')
+      throw new UnauthorizedException('Credenciais não encontradas.(user)')
     }
 
     const isPasswordValid = await compare(password, user.password)
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciais não encontradas.')
+      throw new UnauthorizedException('Credenciais não encontradas.(password)')
     }
 
     const accessToken = this.jwt.sign({ sub: user.id })
