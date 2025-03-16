@@ -48,8 +48,6 @@ export class CreateRecipientsController {
 
     const { name, cpf, address, latitude, longitude } = body
 
-    console.log('Body recebido:', body)
-
     const userWitchSameCpf = await this.prisma.recipient.findUnique({
       where: {
         cpf,

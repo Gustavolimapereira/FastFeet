@@ -35,10 +35,6 @@ export class DeleteRecipientController {
       where: { recipientId: id },
     })
 
-    console.log(delivery, 'delivery')
-
-    console.log(user, 'user')
-
     if (!user) {
       throw new NotFoundException('Usuário não encontrado')
     }

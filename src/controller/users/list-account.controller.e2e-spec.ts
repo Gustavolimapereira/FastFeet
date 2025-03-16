@@ -6,7 +6,7 @@ import { Test } from '@nestjs/testing'
 import * as bcrypt from 'bcrypt'
 import request from 'supertest'
 
-describe('Criar conta (E2E)', () => {
+describe('Lista conta (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
@@ -25,7 +25,7 @@ describe('Criar conta (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /accounts', async () => {
+  test('[GET] /accounts/:id', async () => {
     const password = '123456'
 
     const user = await prisma.user.create({
@@ -49,15 +49,9 @@ describe('Criar conta (E2E)', () => {
     expect(responseLogin.statusCode).toBe(201)
 
     const response = await request(app.getHttpServer())
-      .post('/accounts')
+      .get(`/accounts/${user.id}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        name: 'John Doe',
-        cpf: '111.111.111-11',
-        password: '123456',
-        role: 'ENTREGADOR',
-      })
 
-    expect(response.statusCode).toBe(201)
+    expect(response.statusCode).toBe(200)
   })
 })

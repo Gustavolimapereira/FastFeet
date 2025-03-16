@@ -6,7 +6,7 @@ import { Test } from '@nestjs/testing'
 import * as bcrypt from 'bcrypt'
 import request from 'supertest'
 
-describe('Criar conta (E2E)', () => {
+describe('List recipient (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
@@ -25,7 +25,7 @@ describe('Criar conta (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /accounts', async () => {
+  test('[GET] /recipients/:id', async () => {
     const password = '123456'
 
     const user = await prisma.user.create({
@@ -48,16 +48,20 @@ describe('Criar conta (E2E)', () => {
 
     expect(responseLogin.statusCode).toBe(201)
 
-    const response = await request(app.getHttpServer())
-      .post('/accounts')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        name: 'John Doe',
+    const recipientCreate = await prisma.recipient.create({
+      data: {
+        name: 'Teste e2e',
         cpf: '111.111.111-11',
-        password: '123456',
-        role: 'ENTREGADOR',
-      })
+        address: 'Rua Um, 123 - Centro, São Paulo - SP',
+        latitude: -23.55052,
+        longitude: -46.633308,
+      },
+    })
 
-    expect(response.statusCode).toBe(201)
+    const response = await request(app.getHttpServer())
+      .get(`/recipients/${recipientCreate.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+
+    expect(response.statusCode).toBe(200)
   })
 })

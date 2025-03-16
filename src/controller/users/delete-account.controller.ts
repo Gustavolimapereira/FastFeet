@@ -31,8 +31,6 @@ export class DeleteAccountController {
       where: { id },
     })
 
-    console.log(user, 'user teste')
-
     if (!user) {
       throw new NotFoundException('Usuário não encontrado')
     }

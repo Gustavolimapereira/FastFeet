@@ -6,7 +6,7 @@ import { Test } from '@nestjs/testing'
 import * as bcrypt from 'bcrypt'
 import request from 'supertest'
 
-describe('Criar conta (E2E)', () => {
+describe('Criar delivery (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
@@ -25,7 +25,7 @@ describe('Criar conta (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /accounts', async () => {
+  test('[POST] /delivery', async () => {
     const password = '123456'
 
     const user = await prisma.user.create({
@@ -34,6 +34,15 @@ describe('Criar conta (E2E)', () => {
         cpf: '000.000.000-00',
         password: await bcrypt.hash(password, 8),
         role: 'ADMIN',
+      },
+    })
+
+    const deliveryMan = await prisma.user.create({
+      data: {
+        name: 'deliveryMan',
+        cpf: '999.999.999-99',
+        password: await bcrypt.hash(password, 8),
+        role: 'ENTREGADOR',
       },
     })
 
@@ -48,14 +57,26 @@ describe('Criar conta (E2E)', () => {
 
     expect(responseLogin.statusCode).toBe(201)
 
+    const createRecipient = await prisma.recipient.create({
+      data: {
+        name: 'Teste e2e',
+        cpf: '111.111.111-11',
+        address: 'Rua Um, 123 - Centro, São Paulo - SP',
+        latitude: -23.55052,
+        longitude: -46.633308,
+      },
+    })
+
     const response = await request(app.getHttpServer())
-      .post('/accounts')
+      .post('/delivery')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        name: 'John Doe',
-        cpf: '111.111.111-11',
-        password: '123456',
-        role: 'ENTREGADOR',
+        recipientId: createRecipient.id,
+        adminId: user.id,
+        deliverymanId: deliveryMan.id,
+        status: 'DEVOLVIDA',
+        photoUrl:
+          'https://blog.zanottirefrigeracao.com.br/wp-content/uploads/2017/09/lanche-na-chapa-1024x768.jpg',
       })
 
     expect(response.statusCode).toBe(201)
