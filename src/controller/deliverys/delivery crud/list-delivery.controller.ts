@@ -27,7 +27,7 @@ export class ListDeliveryController {
       throw new NotFoundException('Usuário não é um admin do sistema')
     }
 
-    const deliivery = await this.prisma.delivery.findUnique({
+    const delivery = await this.prisma.delivery.findUnique({
       where: { id },
       select: {
         id: true,
@@ -39,12 +39,12 @@ export class ListDeliveryController {
       },
     })
 
-    if (!deliivery) {
-      throw new NotFoundException('Usuário não encontrado')
+    if (!delivery) {
+      throw new NotFoundException('Entrega não encontrada')
     }
 
     return {
-      deliivery,
+      delivery,
     }
   }
 }

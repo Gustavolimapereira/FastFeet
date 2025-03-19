@@ -1,16 +1,16 @@
-import { UpdateAccountController } from '@/controller/users/update-account.controller'
 import { NotFoundException } from '@nestjs/common'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { PrismaService } from '@/prisma/prisma.service'
 import { z } from 'zod'
+import { UpdateDeliveryController } from '@/controller/deliverys/delivery crud/update-delivery.controller'
 
 type UserPayload = {
   sub: string
   role: 'ADMIN' | 'ENTREGADOR'
 }
 
-describe('UpdateAccountController', () => {
-  let controller: UpdateAccountController
+describe('UpdateDeliveryController', () => {
+  let controller: UpdateDeliveryController
   let prismaService: PrismaService
 
   beforeEach(() => {
@@ -20,20 +20,24 @@ describe('UpdateAccountController', () => {
         findUnique: vi.fn(),
         update: vi.fn(),
       },
+      delivery: {
+        findUnique: vi.fn(),
+        update: vi.fn(),
+      },
     } as unknown as PrismaService
 
     // Instância do controller com o mock do PrismaService
-    controller = new UpdateAccountController(prismaService)
+    controller = new UpdateDeliveryController(prismaService)
   })
 
   it('deve lançar uma exceção se o usuário que está tentando atualizar não for um admin', async () => {
-    const updateAccountBodySchema = z.object({
+    const updateDeliveryBodySchema = z.object({
       name: z.string(),
       cpf: z.string(),
       password: z.string(),
       role: z.enum(['ADMIN', 'ENTREGADOR']),
     })
-    type UpdateAccountBodySchema = z.infer<typeof updateAccountBodySchema>
+    type UpdateDeliveryBodySchema = z.infer<typeof updateDeliveryBodySchema>
 
     const userPayload: UserPayload = {
       sub: '1',
