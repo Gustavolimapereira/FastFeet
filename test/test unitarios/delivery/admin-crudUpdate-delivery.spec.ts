@@ -18,7 +18,6 @@ describe('UpdateDeliveryController', () => {
     prismaService = {
       user: {
         findUnique: vi.fn(),
-        update: vi.fn(),
       },
       delivery: {
         findUnique: vi.fn(),
@@ -32,10 +31,13 @@ describe('UpdateDeliveryController', () => {
 
   it('deve lançar uma exceção se o usuário que está tentando atualizar não for um admin', async () => {
     const updateDeliveryBodySchema = z.object({
-      name: z.string(),
-      cpf: z.string(),
-      password: z.string(),
-      role: z.enum(['ADMIN', 'ENTREGADOR']),
+      recipientId: z.string().uuid().optional(),
+      adminId: z.string().uuid().optional(),
+      deliverymanId: z.string().uuid().optional(),
+      status: z
+        .enum(['AGUARDANDO', 'RETIRADA', 'ENTREGUE', 'DEVOLVIDA'])
+        .optional(),
+      photoUrl: z.string().url().optional(),
     })
     type UpdateDeliveryBodySchema = z.infer<typeof updateDeliveryBodySchema>
 
@@ -54,11 +56,12 @@ describe('UpdateDeliveryController', () => {
       updatedAt: new Date(),
     })
 
-    const body: UpdateAccountBodySchema = {
-      name: 'New User',
-      cpf: '98765432100',
-      password: 'password',
-      role: 'ENTREGADOR', // Tipo explícito
+    const body: UpdateDeliveryBodySchema = {
+      recipientId: '1',
+      adminId: '1',
+      deliverymanId: '1',
+      status: 'AGUARDANDO',
+      photoUrl: 'foto url',
     }
 
     await expect(
@@ -69,51 +72,47 @@ describe('UpdateDeliveryController', () => {
   })
 
   it('deve atualizar se o usuário que está tentando atualizar for um admin', async () => {
-    const updateAccountBodySchema = z.object({
-      name: z.string(),
-      cpf: z.string(),
-      password: z.string(),
-      role: z.enum(['ADMIN', 'ENTREGADOR']),
+    const updateDeliveryBodySchema = z.object({
+      recipientId: z.string().uuid().optional(),
+      adminId: z.string().uuid().optional(),
+      deliverymanId: z.string().uuid().optional(),
+      status: z
+        .enum(['AGUARDANDO', 'RETIRADA', 'ENTREGUE', 'DEVOLVIDA'])
+        .optional(),
+      photoUrl: z.string().url().optional(),
     })
-    type UpdateAccountBodySchema = z.infer<typeof updateAccountBodySchema>
+    type UpdateDeliveryBodySchema = z.infer<typeof updateDeliveryBodySchema>
 
     const userPayload: UserPayload = {
       sub: '1',
       role: 'ADMIN',
     }
 
-    vi.spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValueOnce({
-        id: '1',
-        name: 'Admin User',
-        cpf: '12345678901',
-        password: 'hashedPassword',
-        role: 'ADMIN',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .mockResolvedValueOnce({
-        id: '2',
-        name: 'User to be updated',
-        cpf: '12345678902',
-        password: 'hashedPassword',
-        role: 'ENTREGADOR',
-        createdAt: new Date(),
-      })
-
-    // Configura o mock do `update`
-    vi.spyOn(prismaService.user, 'update').mockResolvedValue({
-      id: '2',
-      name: 'User to be updated',
-      cpf: '12345678902',
-      role: 'ENTREGADOR',
+    vi.spyOn(prismaService.user, 'findUnique').mockResolvedValue({
+      id: '1',
+      name: 'User',
+      cpf: '12345678900',
+      password: 'hashedPassword',
+      role: 'ADMIN',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
 
-    const body: UpdateAccountBodySchema = {
-      name: 'User to be updated',
-      cpf: '12345678902',
-      password: 'hashedPassword',
-      role: 'ENTREGADOR',
+    // Configura o mock do `update`
+    vi.spyOn(prismaService.delivery, 'update').mockResolvedValue({
+      recipientId: '1',
+      adminId: '1',
+      deliverymanId: '1',
+      status: 'AGUARDANDO',
+      photoUrl: 'foto url',
+    })
+
+    const body: UpdateDeliveryBodySchema = {
+      recipientId: '1',
+      adminId: '1',
+      deliverymanId: '1',
+      status: 'AGUARDANDO',
+      photoUrl: 'foto url',
     }
 
     const result = await controller.handle(userPayload, '2', body)
@@ -122,52 +121,15 @@ describe('UpdateDeliveryController', () => {
     expect(result).toBeUndefined()
 
     // Verifica se o método `update` foi chamado corretamente
-    expect(prismaService.user.update).toHaveBeenCalledWith({
+    expect(prismaService.delivery.update).toHaveBeenCalledWith({
       where: { id: '2' },
       data: {
-        name: 'User to be updated',
-        cpf: '12345678902',
-        password: expect.any(String), // A senha será hasheada, então usamos `expect.any`
-        role: 'ENTREGADOR',
+        recipientId: '1',
+        adminId: '1',
+        deliverymanId: '1',
+        status: 'AGUARDANDO',
+        photoUrl: 'foto url',
       },
     })
-  })
-
-  it('deve lançar uma exceção se o usuário a ser listado não for encontrado', async () => {
-    const updateAccountBodySchema = z.object({
-      name: z.string(),
-      cpf: z.string(),
-      password: z.string(),
-      role: z.enum(['ADMIN', 'ENTREGADOR']),
-    })
-    type UpdateAccountBodySchema = z.infer<typeof updateAccountBodySchema>
-
-    const userPayload: UserPayload = {
-      sub: '1',
-      role: 'ADMIN',
-    }
-
-    vi.spyOn(prismaService.user, 'findUnique')
-      .mockResolvedValueOnce({
-        id: '1',
-        name: 'Admin User',
-        cpf: '12345678901',
-        password: 'hashedPassword',
-        role: 'ADMIN',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .mockResolvedValueOnce(null)
-
-    const body: UpdateAccountBodySchema = {
-      name: 'New User',
-      cpf: '98765432100',
-      password: 'password',
-      role: 'ENTREGADOR', // Tipo explícito
-    }
-
-    await expect(
-      controller.handle(userPayload, '2', body),
-    ).rejects.toThrowError(new NotFoundException('Usuário não encontrado'))
   })
 })
